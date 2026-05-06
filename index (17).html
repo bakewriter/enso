@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>enso | streamer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      background: #d6eef8;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .bg-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(200, 230, 255, 0.18);
+      z-index: 1;
+    }
+
+    /* floating wings */
+    .wing {
+      position: absolute;
+      width: 90px;
+      opacity: 0.75;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .w1 { top: 3%;  left: 2%;  animation: drift1 9s  ease-in-out infinite; }
+    .w2 { top: 10%; right: 3%; animation: drift2 11s ease-in-out infinite; width: 70px; opacity: 0.6; }
+    .w3 { bottom: 22%; left: 5%;  animation: drift3 8s  ease-in-out infinite; width: 60px; opacity: 0.5; }
+    .w4 { bottom: 12%; right: 4%; animation: drift1 13s ease-in-out infinite; width: 75px; opacity: 0.65; }
+    .w5 { top: 38%; left: 1%;  animation: drift2 10s ease-in-out infinite; width: 50px; opacity: 0.45; }
+    .w6 { top: 58%; right: 2%; animation: drift3 12s ease-in-out infinite; width: 55px; opacity: 0.5; }
+
+    @keyframes drift1 {
+      0%,100% { transform: translateY(0px) rotate(-5deg); }
+      50%      { transform: translateY(-18px) rotate(5deg); }
+    }
+    @keyframes drift2 {
+      0%,100% { transform: translateY(0px) translateX(0px) rotate(3deg); }
+      33%     { transform: translateY(-12px) translateX(8px) rotate(-3deg); }
+      66%     { transform: translateY(8px)  translateX(-5px) rotate(6deg); }
+    }
+    @keyframes drift3 {
+      0%,100% { transform: translateY(0px) rotate(0deg); }
+      50%     { transform: translateY(-22px) rotate(-8deg); }
+    }
+
+    /* sparkles */
+    .sparkles { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+    .sp {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(180, 220, 255, 0.85);
+      animation: sparkle 4s ease-in-out infinite;
+    }
+    @keyframes sparkle {
+      0%,100% { opacity: 0; transform: scale(0.5); }
+      50%     { opacity: 1; transform: scale(1.3); }
+    }
+
+    /* main content */
+    .content {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 24px 40px;
+      gap: 0;
+    }
+
+    .name-title {
+      font-size: 42px;
+      font-weight: 700;
+      color: #2a7fa8;
+      letter-spacing: 5px;
+      text-shadow: 0 2px 18px rgba(100,180,230,0.5);
+      margin-bottom: 4px;
+    }
+
+    .sub-title {
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 7px;
+      color: #6ab8d8;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .chara-wrap {
+      width: 300px;
+      margin: 6px 0 18px;
+    }
+    .chara-img {
+      width: 100%;
+      display: block;
+      filter: drop-shadow(0 4px 24px rgba(100,180,240,0.4));
+    }
+
+    /* link buttons */
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .link-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 13px 20px;
+      border-radius: 50px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-decoration: none;
+      color: #fff;
+      background: rgba(100, 195, 235, 0.88);
+      box-shadow: 0 2px 14px rgba(80,170,220,0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+    .link-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 22px rgba(80,170,220,0.5);
+      background: rgba(70, 180, 228, 0.97);
+    }
+    .link-btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- background -->
+    <img class="bg-img" src="haikei.jfif" alt="" />
+    <div class="overlay"></div>
+
+    <!-- sparkles -->
+    <div class="sparkles">
+      <div class="sp" style="top:7%;left:14%;width:5px;height:5px;animation-delay:0s;"></div>
+      <div class="sp" style="top:18%;right:18%;width:4px;height:4px;animation-delay:1.2s;"></div>
+      <div class="sp" style="top:44%;left:18%;width:6px;height:6px;animation-delay:2.1s;"></div>
+      <div class="sp" style="top:68%;right:14%;width:3px;height:3px;animation-delay:0.8s;"></div>
+      <div class="sp" style="top:83%;left:28%;width:5px;height:5px;animation-delay:3s;"></div>
+      <div class="sp" style="top:30%;right:8%; width:4px;height:4px;animation-delay:1.7s;"></div>
+    </div>
+
+    <!-- floating wings -->
+    <img class="wing w1" src="天使の羽２.jpg" alt="" />
+    <img class="wing w2" src="天使の羽２.jpg" alt="" />
+    <img class="wing w3" src="天使の羽２.jpg" alt="" />
+    <img class="wing w4" src="天使の羽２.jpg" alt="" />
+    <img class="wing w5" src="天使の羽２.jpg" alt="" />
+    <img class="wing w6" src="天使の羽２.jpg" alt="" />
+
+    <!-- content -->
+    <div class="content">
+      <div class="name-title">enso</div>
+      <div class="sub-title">streamer</div>
+
+      <div class="chara-wrap">
+        <img class="chara-img" src="enso2026.png" alt="enso" />
+      </div>
+
+      <div class="links">
+        <a class="link-btn" href="https://x.com/_e_sub___" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+          X (Twitter)
+        </a>
+        <a class="link-btn" href="https://www.youtube.com/@enso_cl" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+          </svg>
+          YouTube
+        </a>
+        <a class="link-btn" href="https://twitcasting.tv/ens_cl_" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8zm-1-5h2v2h-2zm0-8h2v6h-2z"/>
+          </svg>
+          Twitcasting
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
